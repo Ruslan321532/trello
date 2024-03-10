@@ -1,14 +1,15 @@
-#!/bin/bash
+#!/bin/sh
 
-if [[ "$1" == "--amend" && "$2" == "--no-edit" ]]; then
+  if [[ "$1" == "--amend" && "$2" == "--no-edit" ]]; then
   exit 0
-fi
+  fi
 
-commit_msg_file=$1
-commit_msg=$(cat "$commit_msg_file")
+  commit_msg_file=$1
+  commit_msg=$(cat "$commit_msg_file")
 
-if ! echo "$commit_msg" | grep -E -q '^(bugfix:|release:|feat:|config:|chore:)'; then
-  printf "\nError: \033[31mWrong prefix in commit message\033[0m ❗❗❗\n"
-  printf "Allowed prefixes: \033[34mbugfix: | release: | feat: | config:\033[0m\n"
+  if ! echo "$commit_msg" | grep -E -q '^(bugfix:|release:|feat:|config:|chore:)'; then
+  echo
+echo "Error: \033[31mWrong prefix in commit message\033[0m ❗❗❗ "
+echo "Allowed prefixes: \033[34mbugfix: | release: | feat: | config:\033[0m"
   exit 1
-fi
+  fi
