@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { siteConf } from "@/config/sites";
+import './globals.css';
 
-const inter = Inter({ subsets: ["latin"] });
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+
+import { siteConf } from '@/config/sites';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
@@ -13,8 +15,8 @@ export const metadata: Metadata = {
   description: siteConf.description,
   icons: [
     {
-      url: "/logo.svg",
-      href: "/logo.svg",
+      url: '/logo.svg',
+      href: '/logo.svg',
     },
   ],
 };

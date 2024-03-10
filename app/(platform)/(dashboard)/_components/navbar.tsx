@@ -1,9 +1,11 @@
-import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { Plus } from "lucide-react";
-import React from "react";
-import { MobileSideBar } from "./mobile-sidebar";
+import { OrganizationSwitcher, UserButton } from '@clerk/nextjs';
+import { Plus } from 'lucide-react';
+import React from 'react';
+
+import { Logo } from '@/components/logo';
+import { Button } from '@/components/ui/button';
+
+import { MobileSideBar } from './mobile-sidebar';
 
 export const Navbar = () => {
   return (
@@ -37,9 +39,9 @@ export const Navbar = () => {
           appearance={{
             elements: {
               rootBox: {
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
               },
             },
           }}

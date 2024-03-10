@@ -1,18 +1,20 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { useMobileSidebar } from "@/hooks/mobile-sidebar";
-import { Menu } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Sidebar } from "./sidebar";
+'use client';
+import { Menu } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { useMobileSidebar } from '@/hooks/mobile-sidebar';
+
+import { Sidebar } from './sidebar';
 
 export const MobileSideBar = () => {
   const [mountend, setMoundend] = useState(false);
   const pathname = usePathname();
-  const onOpen = useMobileSidebar((state) => state.onOpen);
-  const onClose = useMobileSidebar((state) => state.onClose);
-  const isOpen = useMobileSidebar((state) => state.isOpen);
+  const onOpen = useMobileSidebar(state => state.onOpen);
+  const onClose = useMobileSidebar(state => state.onClose);
+  const isOpen = useMobileSidebar(state => state.isOpen);
 
   useEffect(() => {
     setMoundend(true);
