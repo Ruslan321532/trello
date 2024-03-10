@@ -1,13 +1,7 @@
-import { ClerkProvider } from "@clerk/nextjs"
+import { ClerkProvider } from '@clerk/nextjs';
 
-const PlatformLayout = ({children}: {children: React.ReactNode}) => {
+const PlatformLayout = ({ children }: { children: React.ReactNode }) => {
+  return <ClerkProvider>{children}</ClerkProvider>;
+};
 
-    return (
-        <ClerkProvider>
-            {children}
-        </ClerkProvider>
-    )
-
-}
-
-export default PlatformLayout
+export default PlatformLayout;

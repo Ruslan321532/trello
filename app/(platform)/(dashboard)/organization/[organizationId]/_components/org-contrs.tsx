@@ -1,7 +1,7 @@
-"use client";
-import { useEffect } from "react";
-import { useParams } from "next/navigation";
-import { useOrganizationList } from "@clerk/nextjs";
+'use client';
+import { useOrganizationList } from '@clerk/nextjs';
+import { useParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 export const OrgControl = () => {
   const params = useParams();

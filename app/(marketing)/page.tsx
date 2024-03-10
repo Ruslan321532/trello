@@ -1,18 +1,18 @@
-import Link from "next/link";
-import localFont from "next/font/local";
-import { Poppins } from "next/font/google";
-import { Medal } from "lucide-react";
+import { Medal } from 'lucide-react';
+import { Poppins } from 'next/font/google';
+import localFont from 'next/font/local';
+import Link from 'next/link';
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const headingFont = localFont({
-  src: "../../public/fonts/font.woff2",
+  src: '../../public/fonts/font.woff2',
 });
 
 const textFont = Poppins({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
 });
 
 const MarketingPage = () => {
@@ -20,7 +20,7 @@ const MarketingPage = () => {
     <div className="flex items-center justify-center flex-col">
       <div
         className={cn(
-          "flex items-center justify-center flex-col",
+          'flex items-center justify-center flex-col',
           headingFont.className
         )}
       >
@@ -37,7 +37,7 @@ const MarketingPage = () => {
       </div>
       <div
         className={cn(
-          "text-sm md:text-xl text-neutral-400 mt-4 max-w-xs md:max-w-2xl text-center mx-auto",
+          'text-sm md:text-xl text-neutral-400 mt-4 max-w-xs md:max-w-2xl text-center mx-auto',
           textFont.className
         )}
       >

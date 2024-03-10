@@ -1,5 +1,6 @@
-import React from "react";
-import { OrgControl } from "./_components/org-contrs";
+import React from 'react';
+
+import { OrgControl } from './_components/org-contrs';
 
 const OrganizationIdLayout = ({ children }: { children: React.ReactNode }) => {
   return (
