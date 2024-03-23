@@ -1,17 +1,19 @@
-import { db } from '@/lib/db';
+import { Suspense } from 'react';
 
-import { Board } from './board';
-import { Form } from './form';
+import { Separator } from '@/components/ui/separator';
+
+import { BoardList } from './_components/board-list';
+import { Info } from './_components/info';
 
 const OrganizationPage = async () => {
-  const boardsblock = await db.board.findMany();
   return (
-    <div className="flex flex-col space-y-4">
-      <Form />
-      <div>
-        {boardsblock.map(board => (
-          <Board title={board.title} key={board.id} id={board.id} />
-        ))}
+    <div className="w-full mb-20">
+      <Info />
+      <Separator className="my-4" />
+      <div className="px-2 md:px4">
+        <Suspense fallback={<BoardList.Skeleton />}>
+          <BoardList />
+        </Suspense>
       </div>
     </div>
   );
