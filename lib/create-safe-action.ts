@@ -1,12 +1,14 @@
 import { z } from 'zod';
 
+import { NullableString } from '@/types/commonTypes';
+
 export type FieldErrors<T> = {
   [K in keyof T]?: string[];
 };
 
 export type ActionState<TInput, TOutput> = {
   fieldErrors?: FieldErrors<TInput>;
-  error?: string | null;
+  error?: NullableString<string> | null;
   data?: TOutput;
 };
 
