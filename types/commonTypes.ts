@@ -1,1 +1,1 @@
-export type NullableString<T> = T | null;
+export type NullableString<T extends string> = T | null | undefined;
