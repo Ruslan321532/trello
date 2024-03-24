@@ -4,7 +4,7 @@ import { Navbar } from './_components/navbar';
 
 const Dashboardlayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
+    <div className="h-full">
       <Navbar />
       {children}
     </div>
