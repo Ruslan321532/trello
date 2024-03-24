@@ -29,7 +29,7 @@ model List {
   order   Int
   boardId String
   board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  cards     Card[]
+  cards   Card[]
 
   @@index([boardId])
 }
