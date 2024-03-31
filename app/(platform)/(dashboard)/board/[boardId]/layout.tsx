@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs';
 import { notFound, redirect } from 'next/navigation';
 
-import { db } from '@/lib/db';
+import { db } from '@/config/db';
 
 import { BoardNavbar } from './_components/board-navbar';
 

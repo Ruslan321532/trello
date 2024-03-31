@@ -1,7 +1,7 @@
 import { Card } from '@prisma/client';
 import { z } from 'zod';
 
-import { ActionState } from '@/lib/create-safe-action';
+import { ActionState } from '@/helpers/create-safe-action';
 
 import { UpdateCardOrder } from './scheme';
 

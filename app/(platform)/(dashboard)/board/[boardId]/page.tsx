@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 
-import { db } from '@/lib/db';
+import { db } from '@/config/db';
 
 import { ListContainer } from './_components/board-list-container';
 

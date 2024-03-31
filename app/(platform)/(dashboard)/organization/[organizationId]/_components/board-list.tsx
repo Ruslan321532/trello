@@ -6,7 +6,9 @@ import { redirect } from 'next/navigation';
 import { Hint } from '@/components/hint';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FormPopover } from '@/components/useForm/form-popover';
-import { db } from '@/lib/db';
+import { db } from '@/config/db';
+import { MAX_BOARD_FREE } from '@/constants/board';
+import { getAvailableCount } from '@/helpers/org-limit';
 
 export const BoardList = async () => {
   const { orgId } = auth();
@@ -23,6 +25,7 @@ export const BoardList = async () => {
       createdAt: 'desc',
     },
   });
+  const availableCount = await getAvailableCount();
   return (
     <div className="space-y-4">
       <div className="flex items-center font-semibold text-lg text-neutral-700">
@@ -47,7 +50,7 @@ export const BoardList = async () => {
             className="aspect-video relative h-full w-full bg-muted rounded-sm flex flex-col gap-y-1 items-center justify-center hover:opacity-75 transition"
           >
             <p className="text-sm">Create new board</p>
-            <span className="text-xs">5 remaning</span>
+            <span className="text-xs">{`${MAX_BOARD_FREE - availableCount} remaining`}</span>
             <Hint
               sideOffSet={40}
               description={`

@@ -1,10 +1,13 @@
 'use server';
 
 import { auth } from '@clerk/nextjs';
+import { ACTION, ENTITY_TYPE } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
-import { createSafeAction } from '@/lib/create-safe-action';
-import { db } from '@/lib/db';
+import { db } from '@/config/db';
+import { createAuditLog } from '@/helpers/create-audit-log';
+import { createSafeAction } from '@/helpers/create-safe-action';
+import { hasAvailableCount } from '@/helpers/org-limit';
 
 import { CreateBoard } from './schema';
 import { InputType, ReturnType } from './types';
@@ -18,6 +21,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
+  const cancelCreate = await hasAvailableCount();
+
+  if (cancelCreate) {
+    return {
+      error: 'your limit  off the free boards.',
+    };
+  }
   const { title, image } = data;
 
   const [imageId, imageThumbUrl, imageFullUrl, imageLinkHTML, imageUserName] =
@@ -55,6 +65,12 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         imageThumbUrl,
         imageLinkHTML,
       },
+    });
+    await createAuditLog({
+      entityTitle: board.title,
+      entityID: board.id,
+      entityType: ENTITY_TYPE.CARD,
+      action: ACTION.CREATE,
     });
   } catch (error) {
     return {

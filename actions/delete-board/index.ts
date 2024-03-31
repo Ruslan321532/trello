@@ -1,11 +1,14 @@
 'use server';
 
 import { auth } from '@clerk/nextjs';
+import { ACTION, ENTITY_TYPE } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-import { createSafeAction } from '@/lib/create-safe-action';
-import { db } from '@/lib/db';
+import { db } from '@/config/db';
+import { createAuditLog } from '@/helpers/create-audit-log';
+import { createSafeAction } from '@/helpers/create-safe-action';
+import { decreaseAvailableCount } from '@/helpers/org-limit';
 
 import { DeleteBoard } from './scheme';
 import { InputType, ReturnType } from './types';
@@ -23,11 +26,19 @@ const handler = async (data: InputType): Promise<ReturnType> => {
   let board;
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     board = await db.board.delete({
       where: {
         id,
         orgId,
       },
+    });
+    await decreaseAvailableCount();
+    await createAuditLog({
+      entityTitle: board.title,
+      entityID: board.id,
+      entityType: ENTITY_TYPE.CARD,
+      action: ACTION.CREATE,
     });
   } catch (error) {
     return {

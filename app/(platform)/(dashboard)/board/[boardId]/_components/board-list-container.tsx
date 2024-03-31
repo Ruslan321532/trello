@@ -1,6 +1,5 @@
 'use client';
-
-import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, DropResult } from '@hello-pangea/dnd';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -17,16 +16,8 @@ interface ListContainerProps {
   boardId: string;
 }
 
-function reorder<T>(list: T[], startIndex: number, endIndex: number) {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-
-  return result;
-}
-
 export const ListContainer = ({ data, boardId }: ListContainerProps) => {
-  const [orderedData, setOrderedData] = useState(data);
+  const [orderedData, setOrderedData] = useState<ListWithCards[]>(data);
 
   const { execute: executeUpdateListOrder } = useAction(updateListOrder, {
     onSuccess: () => {
@@ -50,104 +41,85 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
     setOrderedData(data);
   }, [data]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onDragEnd = (result: any) => {
-    const { destination, source, type } = result;
+  const handleListDrop = (result: DropResult) => {
+    const { destination, source } = result;
+    if (!destination || destination.index === source.index) return;
 
-    if (!destination) {
-      return;
-    }
+    const reorderedLists = reorderList(
+      orderedData,
+      source.index,
+      destination.index
+    );
+    setOrderedData(reorderedLists);
+    executeUpdateListOrder({ items: reorderedLists, boardId });
+  };
 
+  const handleCardDrop = (result: DropResult) => {
+    const { destination, source } = result;
     if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
+      !destination ||
+      (destination.droppableId === source.droppableId &&
+        destination.index === source.index)
     ) {
       return;
     }
 
-    if (type === 'list') {
-      const items = reorder(orderedData, source.index, destination.index).map(
-        (item, index) => ({ ...item, order: index })
-      );
+    const newOrderedData = [...orderedData];
+    const sourceListIndex = newOrderedData.findIndex(
+      list => list.id === source.droppableId
+    );
+    const destListIndex = newOrderedData.findIndex(
+      list => list.id === destination.droppableId
+    );
 
-      setOrderedData(items);
-      executeUpdateListOrder({ items, boardId });
+    if (sourceListIndex === -1 || destListIndex === -1) {
+      return;
     }
 
-    if (type === 'card') {
-      const newOrderedData = [...orderedData];
+    const sourceList = newOrderedData[sourceListIndex];
+    const destList = newOrderedData[destListIndex];
 
-      const sourceList = newOrderedData.find(
-        list => list.id === source.droppableId
-      );
-      const destList = newOrderedData.find(
-        list => list.id === destination.droppableId
-      );
+    const movedCard = sourceList.cards.splice(source.index, 1)[0];
+    movedCard.listId = destList.id;
+    destList.cards.splice(destination.index, 0, movedCard);
 
-      if (!sourceList || !destList) {
-        return;
-      }
+    const updateCardOrders = (list: ListWithCards) => {
+      list.cards.forEach((card, index) => {
+        card.order = index;
+      });
+    };
 
-      // Проверяю, существуют ли карты в sourceList
-      if (!sourceList.cards) {
-        sourceList.cards = [];
-      }
+    updateCardOrders(sourceList);
+    updateCardOrders(destList);
 
-      // Проверяю, существуют ли карты в destList
-      if (!destList.cards) {
-        destList.cards = [];
-      }
+    setOrderedData(newOrderedData);
+    executeUpdateCardOrder({
+      boardId,
+      items: newOrderedData[destListIndex].cards,
+    });
+  };
 
-      // Перемещение карты в том же списке (верх вниз в той же колонке)
-      if (source.droppableId === destination.droppableId) {
-        const reorderedCards = reorder(
-          sourceList.cards,
-          source.index,
-          destination.index
-        );
-
-        reorderedCards.forEach((card, idx) => {
-          card.order = idx;
-        });
-
-        sourceList.cards = reorderedCards;
-
-        setOrderedData(newOrderedData);
-        executeUpdateCardOrder({
-          boardId: boardId,
-          items: reorderedCards,
-        });
-        // Пользователь перемещает карточку в другой список
-      } else {
-        // Удалить карту из списка источников
-        const [movedCard] = sourceList.cards.splice(source.index, 1);
-
-        // Присваиваю новый listId перемещенной карте
-        movedCard.listId = destination.droppableId;
-
-        // Добавляю карту в список направлений
-        destList.cards.splice(destination.index, 0, movedCard);
-
-        sourceList.cards.forEach((card, idx) => {
-          card.order = idx;
-        });
-
-        // Обновление порядка для каждой карты в списке назначений.
-        destList.cards.forEach((card, idx) => {
-          card.order = idx;
-        });
-
-        setOrderedData(newOrderedData);
-        executeUpdateCardOrder({
-          boardId: boardId,
-          items: destList.cards,
-        });
-      }
-    }
+  const reorderList = (
+    list: ListWithCards[],
+    startIndex: number,
+    endIndex: number
+  ) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result.map((item, index) => ({ ...item, order: index }));
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragEnd={(result: DropResult) => {
+        if (result.type === 'list') {
+          handleListDrop(result);
+        } else if (result.type === 'card') {
+          handleCardDrop(result);
+        }
+      }}
+    >
       <Droppable droppableId="lists" type="list" direction="horizontal">
         {provided => (
           <ol
@@ -155,9 +127,9 @@ export const ListContainer = ({ data, boardId }: ListContainerProps) => {
             ref={provided.innerRef}
             className="flex gap-x-3 h-full"
           >
-            {orderedData.map((list, index) => {
-              return <ListItem key={list.id} index={index} data={list} />;
-            })}
+            {orderedData.map((list, index) => (
+              <ListItem key={list.id} index={index} data={list} />
+            ))}
             {provided.placeholder}
             <ListForm />
             <div className="flex-shrink-0 w-1" />
