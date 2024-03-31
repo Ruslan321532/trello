@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/config/db';
 
 export async function GET(
-  req: Request,
+  request: Request,
   { params }: { params: { cardId: string } }
 ) {
   try {
@@ -15,7 +15,7 @@ export async function GET(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const auditLog = await db.auditLog.findMany({
+    const auditLogs = await db.auditLog.findMany({
       where: {
         orgId,
         entityID: params.cardId,
@@ -27,7 +27,7 @@ export async function GET(
       take: 3,
     });
 
-    return NextResponse.json(auditLog);
+    return NextResponse.json(auditLogs);
   } catch (error) {
     return new NextResponse('Internal Error', { status: 500 });
   }

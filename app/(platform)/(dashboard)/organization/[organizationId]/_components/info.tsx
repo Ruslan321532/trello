@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 import { Skeleton } from '@/components/ui/skeleton';
 interface InfoProps {
-  isPro?: boolean;
+  isPro: boolean;
 }
 export const Info = ({ isPro }: InfoProps) => {
   const { organization, isLoaded } = useOrganization();
@@ -29,7 +29,7 @@ export const Info = ({ isPro }: InfoProps) => {
         <p>{organization?.name}</p>
         <div className="flex items-center text-xs text-muted-foreground">
           <CreditCard className="h-3 w-3 mr-1" />
-          {isPro ? 'pro' : 'free'}
+          {isPro ? 'Pro' : 'Free'}
         </div>
       </div>
     </div>

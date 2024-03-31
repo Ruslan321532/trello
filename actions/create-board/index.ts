@@ -7,7 +7,11 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/config/db';
 import { createAuditLog } from '@/helpers/create-audit-log';
 import { createSafeAction } from '@/helpers/create-safe-action';
-import { hasAvailableCount } from '@/helpers/org-limit';
+import {
+  hasAvailableCount,
+  incrementAvailableCount,
+} from '@/helpers/org-limit';
+import { checkSubscription } from '@/helpers/subscription';
 
 import { CreateBoard } from './schema';
 import { InputType, ReturnType } from './types';
@@ -17,17 +21,20 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   if (!userId || !orgId) {
     return {
-      error: 'not authorider',
+      error: 'Unauthorized',
     };
   }
 
-  const cancelCreate = await hasAvailableCount();
+  const canCreate = await hasAvailableCount();
+  const isPro = await checkSubscription();
 
-  if (cancelCreate) {
+  if (!canCreate && !isPro) {
     return {
-      error: 'your limit  off the free boards.',
+      error:
+        'You have reached your limit of free boards. Please upgrade to create more.',
     };
   }
+
   const { title, image } = data;
 
   const [imageId, imageThumbUrl, imageFullUrl, imageLinkHTML, imageUserName] =
@@ -44,14 +51,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       error: 'Missing fields. Failed to create board.',
     };
   }
-  console.log({
-    image,
-    imageFullUrl,
-    imageId,
-    imageLinkHTML,
-    imageThumbUrl,
-    imageUserName,
-  });
+
   let board;
 
   try {
@@ -60,26 +60,31 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         title,
         orgId,
         imageId,
+        imageThumbUrl,
         imageFullUrl,
         imageUserName,
-        imageThumbUrl,
         imageLinkHTML,
       },
     });
+
+    if (!isPro) {
+      await incrementAvailableCount();
+    }
+
     await createAuditLog({
       entityTitle: board.title,
       entityID: board.id,
-      entityType: ENTITY_TYPE.CARD,
+      entityType: ENTITY_TYPE.BOARD,
       action: ACTION.CREATE,
     });
   } catch (error) {
     return {
-      error: 'di naxui',
+      error: 'Failed to create.',
     };
   }
 
-  revalidatePath(`board/${board.id}`);
-
+  revalidatePath(`/board/${board.id}`);
   return { data: board };
 };
+
 export const createBoard = createSafeAction(CreateBoard, handler);
