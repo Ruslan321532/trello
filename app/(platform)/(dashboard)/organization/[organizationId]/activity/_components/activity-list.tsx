@@ -20,18 +20,22 @@ export const ActivityList = async () => {
   });
   return (
     <ol className="space-y-4 mt-4">
-      <div className="flex items-center justify-center">
-        <Image
-          src="/emptyState/activity-empty-state.jpg"
-          alt="empty state"
-          width={250}
-          height={250}
-          className="object-contain"
-        />
-      </div>
-      <p className="hidden last:block text-xs text-center text-muted-foreground">
-        No activity found inside this organization
-      </p>
+      {auditlogs.length === 0 && (
+        <>
+          <div className="flex items-center justify-center">
+            <Image
+              src="/emptyState/activity-empty-state.jpg"
+              alt="empty state"
+              width={250}
+              height={250}
+              className="object-contain"
+            />
+          </div>
+          <p className="hidden last:block text-xs text-center text-muted-foreground">
+            No activity found inside this organization
+          </p>
+        </>
+      )}
       {auditlogs.map(log => (
         <ActivityItem key={log.id} data={log} />
       ))}
